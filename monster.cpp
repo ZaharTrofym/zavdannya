@@ -20,11 +20,13 @@ class Monster {
 class Engine : Monster {
     private:
         string saver;
+        bool win_or_lose;
     public:
-        void generateMonster() {
+        void generate() {
             lvl_monster = rand() % 10;
             hp_monster = lvl_monster * 25;
             saver = "abcdefgABCDEFG";
+            win_or_lose = false;
         }
 
         void paintArena(int m = 0, int p = 0) {
@@ -66,6 +68,11 @@ class Engine : Monster {
         void attackOnMonster() {
             attack_on_monster_hp = rand() % 16 + 15;
             hp_monster -= attack_on_monster_hp;
+
+            if (hp_monster < 0) {
+                hp_monster = 0;
+            }
+
             cout << "\nВи нанесли монстру " << attack_on_monster_hp << " ХП, в нього залишилося " << hp_monster << "ХП";
         }
 
@@ -93,7 +100,7 @@ class Engine : Monster {
             }
             else {
                 int damage = rand() % 21 + 20;
-                cout << "\nВи ввели код неправильно, вам нанесено " << damage << "ХП\n";
+                cout << "\nВи ввели код неправильно, вам нанесено " << damage << "ХП";
                 return damage;
             }
         }
@@ -113,6 +120,9 @@ class Player {
 
         void addDamage(int damage) {
             hp -= damage;
+            if (hp < 0) {
+                hp = 0;
+            }
         }
 };
 
@@ -121,7 +131,7 @@ int main() {
     Engine Game;
     Player Player;
     Player.createPlayer();
-    Game.generateMonster();
+    Game.generate();
     bool win_or_lose = false;
     int player_hp;
 
@@ -139,9 +149,14 @@ int main() {
         pause("");
 
         Game.paintArena();
-        
         Game.attackOnMonster();
 
+        if (Game.getMonsterHp() == 0) {
+            cout << "\nВи виграли монстра, для виходу нажміть Enter ";
+            pause("");
+            exit(0);
+        }
+        
         pause("Зараз на вас буде атакувати монстр");
 
         Game.paintArena(1, 0);
@@ -149,7 +164,13 @@ int main() {
         player_hp = Game.savePlayer();
         Player.addDamage(player_hp);
 
-        cout << "У вас залишилося " << Player.getPlayerHp() << " ХП";
+        if (Player.getPlayerHp() == 0) {
+            cout << "\nВи програли, для виходу нажміть Enter ";
+            pause("");
+            exit(0);
+        }
+
+        cout << "\nУ вас залишилося " << Player.getPlayerHp() << " ХП";
 
         pause("");
     }
